@@ -1,0 +1,28 @@
+{
+  "build": {
+    "distDir": "../",
+    "devPath": "../",
+    "beforeDevCommand": "",
+    "beforeBuildCommand": ""
+  },
+  "tauri": {
+    "bundle": {
+      "identifier": "com.mystickynote.app",
+      "targets": "all"
+    },
+    "security": {
+      "csp": null
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "resizable": true,
+        "title": "MyStickyNote",
+        "width": 300,
+        "height": 300,
+        "transparent": true,
+        "decorations": false
+      }
+    ]
+  }
+}
