@@ -1,0 +1,27 @@
+name: Build My EXE
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^1.0.0"
+
+      - name: Build App
+        run: cargo tauri build
+        
+      - name: Upload EXE
+        uses: actions/upload-artifact@v3
+        with:
+          name: MyStickyNote-EXE
+          path: src-tauri/target/release/my-sticky-note.exe
