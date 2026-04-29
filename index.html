@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>原子化便签</title>
+    <style>
+        body { margin: 0; padding: 0; font-family: "Times New Roman", Times, serif; background-color: transparent; }
+        .desktop-background { display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        .atomic-card { width: 260px; height: 260px; background: rgba(224, 242, 241, 0.95); border: 1px solid rgba(0, 137, 123, 0.4); border-radius: 16px; box-shadow: 0 12px 35px rgba(0, 77, 64, 0.2); padding: 15px 20px; display: flex; flex-direction: column; transition: all 0.3s ease; }
+        .window-header { display: flex; justify-content: space-between; align-items: center; height: 28px; margin-bottom: 10px; opacity: 0.2; transition: opacity 0.3s ease; }
+        .atomic-card:hover .window-header { opacity: 1; }
+        .drag-handle { color: #00897b; cursor: grab; font-size: 20px; user-select: none; flex-grow: 1; -webkit-app-region: drag; }
+        .mode-switch-btn { background: rgba(0, 137, 123, 0.1); border: 1px solid #00897b; color: #00695c; font-size: 12px; padding: 4px 8px; border-radius: 6px; cursor: pointer; margin-right: 10px; transition: all 0.2s; -webkit-app-region: no-drag;}
+        .mode-switch-btn:hover { background: #00897b; color: white; }
+        .close-btn { background: none; border: none; color: #00695c; font-size: 22px; cursor: pointer; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; -webkit-app-region: no-drag;}
+        .close-btn:hover { background: #d32f2f; color: white; }
+        .content-area { display: flex; flex-direction: row; flex-grow: 1; margin-top: 5px; gap: 12px; overflow: hidden; }
+        .big-checkbox { width: 24px; height: 24px; border: 2.5px solid #00897b; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; color: white; transition: all 0.2s; flex-shrink: 0; margin-top: 2px; -webkit-app-region: no-drag;}
+        .big-checkbox.checked { background-color: #00897b; }
+        .text-area { flex-grow: 1; background: transparent; border: none; outline: none; font-family: "Times New Roman", Times, serif; font-size: 18px; color: #00332c; line-height: 1.6; resize: none; width: 100%; height: 100%; -webkit-app-region: no-drag;}
+        .text-area::placeholder { color: rgba(0, 137, 123, 0.4); font-style: italic; font-size: 16px; }
+        .completed-mode .text-area { color: #78909c; text-decoration: line-through; text-decoration-color: #00897b; text-decoration-thickness: 2px; opacity: 0.8; }
+        .completed-mode { background: rgba(224, 242, 241, 0.6); }
+    </style>
+</head>
+<body>
+    <div class="desktop-background">
+        <div class="atomic-card" id="card">
+            <div class="window-header">
+                <div class="drag-handle" title="按住拖动窗口">≡</div>
+                <button class="mode-switch-btn" id="modeBtn">转为纯笔记</button>
+                <button class="close-btn" id="closeBtn">×</button>
+            </div>
+            <div class="content-area">
+                <div class="big-checkbox" id="checkbox"></div>
+                <textarea class="text-area" id="textarea" spellcheck="false" placeholder="输入一项具体的任务..."></textarea>
+            </div>
+        </div>
+    </div>
+    <script>
+        const card = document.getElementById('card');
+        const modeBtn = document.getElementById('modeBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const checkbox = document.getElementById('checkbox');
+        const textarea = document.getElementById('textarea');
+        let isTodoMode = true; let isCompleted = false;
+
+        modeBtn.addEventListener('click', () => {
+            isTodoMode = !isTodoMode;
+            if (isTodoMode) {
+                modeBtn.textContent = '转为纯笔记'; checkbox.style.display = 'flex'; textarea.placeholder = '输入一项具体的任务...';
+            } else {
+                modeBtn.textContent = '转为待办'; checkbox.style.display = 'none'; textarea.placeholder = '随时记录灵感...';
+                isCompleted = false; checkbox.classList.remove('checked'); checkbox.innerHTML = ''; card.classList.remove('completed-mode');
+            }
+        });
+        checkbox.addEventListener('click', () => {
+            isCompleted = !isCompleted;
+            if (isCompleted) { checkbox.classList.add('checked'); checkbox.innerHTML = '✓'; card.classList.add('completed-mode'); } 
+            else { checkbox.classList.remove('checked'); checkbox.innerHTML = ''; card.classList.remove('completed-mode'); }
+        });
+        // 调用底层关闭窗口API
+        closeBtn.addEventListener('click', () => { window.__TAURI__.process.exit(); });
+    </script>
+</body>
+</html>
